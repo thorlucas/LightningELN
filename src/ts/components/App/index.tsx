@@ -100,7 +100,10 @@ function appStateReducer(state: AppState, action: AppAction): AppState {
 
 const App = () => {
 	const [state, dispatch] = useReducer(appStateReducer, {
-		documents: [],
+		documents: [{
+			type: 'file',
+			path: 'procedures/foo.txt',
+		}],
 		focused: null,
 		toolbar: null,
 	});

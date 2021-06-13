@@ -1,13 +1,23 @@
-import React from 'react';
+import { FocusProvider } from '@components/Contexts/Focus';
+import React, { FocusEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const DocumentPanel = ({ title, dirty, onClose, children }) => {
-	const focused = false; // TODO
-	const shadow = focused ? 'shadow-lg' : 'shadow-md';
-	const translate = focused ? '-translate-y-1' : '';
+	const renderWrapper = useCallback(({ attributes, children, focused }) => {
+		const shadow = focused ? 'shadow-lg' : 'shadow-md';
+		const translate = focused ? '-translate-y-1' : '';
+
+		return (
+			<div
+				{ ...attributes }
+				className={ `relative h-full flex-1 bg-white overflow-hidden rounded-md transform ${shadow} ${translate} transition-transform transition-shadow outline-none` }
+			>
+				{ children }
+			</div>
+		);
+	}, []);
+
 	return (
-		<div
-			className={ `relative h-full flex-1 bg-white overflow-hidden rounded-md transform ${shadow} ${translate} transition-transform transition-shadow outline-none` }
-		>
+		<FocusProvider render={ renderWrapper }>
 			<div className="absolute top-0 inset-x-0 z-10 py-3 bg-white">
 				<div className="absolute left-0 top-0 py-3.5 pl-3 flex space-x-1.5">
 					<button
@@ -22,7 +32,7 @@ const DocumentPanel = ({ title, dirty, onClose, children }) => {
 			<div className="pt-12 px-8 h-full min-h-0 overflow-y-scroll">
 				{ children }
 			</div>
-		</div>
+		</FocusProvider>
 	);
 };
 
