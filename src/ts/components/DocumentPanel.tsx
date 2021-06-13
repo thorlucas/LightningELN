@@ -27,16 +27,16 @@ const DocumentPanel = ({ document, onClose }: {
 	document: Document,
 	onClose: () => void,
 }) => {
-	const [value, setValue, save] = useFile<Descendant[]>(document.path, {
+	const [value, setValue, save, dirty] = useFile<Descendant[]>(document.path, {
 		serializer: serializeDocument,
 		deserializer: deserializeDocument,
 	}, emptyBuffer);
 
 	const renderTitle = useCallback(() => {
 		return (
-			<span>{ document.path }</span>
+			<span className={ dirty ? 'italic' : '' }>{ document.path }</span>
 		);
-	}, [document]);
+	}, [document, dirty]);
 
 	return (
 		<Panel

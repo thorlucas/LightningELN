@@ -10,7 +10,8 @@ export function useFile<T>(
 	},
 	init: T,
 ) {
-	const [value, setValue] = useState<(T)>(init);
+	const [value, setValue] = useState<T>(init);
+	const [dirty, setDirty] = useState<boolean>(false);
 
 	useEffect(() => {
 		window.fs.readFile(filePath)
@@ -28,11 +29,20 @@ export function useFile<T>(
 		window.fs.writeFile(filePath, data)
 		.then(() => {
 			console.log(`Saved ${filePath}`);
+			setDirty(false);
 		})
 		.catch((err: Error) => {
 			console.error(err);
 		});
 	}, [value]);
 
-	return [value, setValue, save];
+	const setValuePre = useCallback((newValue: T) => {
+		// FIXME: slate editor will update value even when shit hasnt changed
+		if (!dirty) {
+			setDirty(true);
+		}
+		setValue(newValue);
+	}, [dirty]);
+
+	return [value, setValuePre, save, dirty];
 }
