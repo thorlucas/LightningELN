@@ -1,0 +1,54 @@
+{
+	"name": "LightningELN",
+	"version": "1.0.0",
+	"description": "Lightning Electronic Lab Notebook",
+	"main": "main.js",
+	"scripts": {
+		"start": "npm run dev && electron .",
+		"dev": "npm run development",
+		"development": "mix",
+		"watch": "mix watch",
+		"watch-poll": "mix watch -- --watch-options-poll=1000",
+		"hot": "mix watch --hot",
+		"prod": "npm run production",
+		"production": "mix --production",
+		"pack": "npm run prod && electron-builder --dir",
+		"dist": "npm run prod && electron-builder"
+	},
+	"keywords": [],
+	"author": "Thor Lucas Dev",
+	"license": "ISC",
+	"build": {
+		"appId": "me.thorlucas.lightningeln",
+		"mac": {
+			"category": "public.app-category.productivity"
+		}
+	},
+	"devDependencies": {
+		"@babel/preset-react": "^7.13.13",
+		"@types/lodash": "^4.14.170",
+		"@types/react": "^17.0.6",
+		"@types/react-dom": "^17.0.5",
+		"@types/uniqid": "^5.3.0",
+		"autoprefixer": "^10.2.5",
+		"electron": "^12.0.9",
+		"electron-devtools-installer": "^3.2.0",
+		"laravel-mix": "^6.0.19",
+		"lodash": "^4.17.21",
+		"postcss": "^8.3.0",
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2",
+		"react-transition-group": "^4.4.2",
+		"slate": "^0.63.0",
+		"slate-history": "^0.62.0",
+		"slate-react": "^0.63.0",
+		"tailwindcss": "^2.1.2",
+		"ts-loader": "^9.2.1",
+		"typescript": "^4.2.4",
+		"uniqid": "^5.3.0"
+	},
+	"dependencies": {
+		"@types/mousetrap": "^1.6.8",
+		"mousetrap": "^1.6.5"
+	}
+}
