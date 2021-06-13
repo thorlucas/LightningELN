@@ -126,7 +126,10 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 
-var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js")); // TODO: Fix import here
+
+
+var Document_1 = __webpack_require__(/*! ../../types/Document */ "./src/ts/types/Document.ts");
 
 var WithSidebar_1 = __importDefault(__webpack_require__(/*! @components/UI/WithSidebar */ "./src/ts/components/UI/WithSidebar.tsx"));
 
@@ -136,47 +139,30 @@ var PanelContainer_1 = __importDefault(__webpack_require__(/*! @components/UI/Pa
 
 var Browser_1 = __importDefault(__webpack_require__(/*! @components/Browser */ "./src/ts/components/Browser/index.tsx"));
 
-var EditorPanel_1 = __importDefault(__webpack_require__(/*! @components/EditorPanel */ "./src/ts/components/EditorPanel/index.tsx"));
-
-var Document = {
-  key: function key(doc) {
-    switch (doc.type) {
-      case 'file':
-        return doc.path;
-    }
-  },
-  isEqual: function isEqual(lhs, rhs) {
-    if (lhs.type !== rhs.type) return false;
-
-    switch (lhs.type) {
-      case 'file':
-        return lhs.path === rhs.path;
-    }
-  }
-};
+var DocumentPanel_1 = __importDefault(__webpack_require__(/*! @components/DocumentPanel */ "./src/ts/components/DocumentPanel.tsx"));
 
 function appStateReducer(state, action) {
   switch (action.type) {
     case 'open':
       var doc = state.documents.find(function (doc) {
-        return Document.key(doc) === Document.key(action.document);
+        return Document_1.Document.key(doc) === Document_1.Document.key(action.document);
       });
 
       if (doc === undefined) {
         return __assign(__assign({}, state), {
           documents: [action.document].concat(state.documents),
-          focused: Document.key(action.document)
+          focused: Document_1.Document.key(action.document)
         });
       } else {
         return __assign(__assign({}, state), {
-          focused: Document.key(doc)
+          focused: Document_1.Document.key(doc)
         });
       }
 
     case 'close':
       return {
         documents: state.documents.filter(function (doc) {
-          return Document.key(doc) !== action.key;
+          return Document_1.Document.key(doc) !== action.key;
         }),
         focused: state.focused === action.key ? null : state.focused,
         toolbar: state.focused === action.key ? null : state.toolbar
@@ -207,34 +193,17 @@ var App = function App() {
       dispatch = _a[1];
 
   var documentPanels = state.documents.map(function (doc) {
-    var key = Document.key(doc);
-
-    switch (doc.type) {
-      case 'file':
-        return react_1["default"].createElement(EditorPanel_1["default"], {
-          key: key,
-          fileName: doc.path,
-          focused: state.focused === key,
-          onClose: function onClose() {
-            dispatch({
-              type: 'close',
-              key: key
-            });
-          },
-          onFocus: function onFocus() {
-            dispatch({
-              type: 'focus',
-              key: key
-            });
-          },
-          onSetToolbar: function onSetToolbar(toolbar) {
-            dispatch({
-              type: 'setToolbar',
-              toolbar: toolbar
-            });
-          }
+    var key = Document_1.Document.key(doc);
+    return react_1["default"].createElement(DocumentPanel_1["default"], {
+      key: key,
+      document: doc,
+      onClose: function onClose() {
+        dispatch({
+          type: 'close',
+          key: key
         });
-    }
+      }
+    });
   });
   return react_1["default"].createElement(WithSidebar_1["default"], {
     sidebar: react_1["default"].createElement(Browser_1["default"], {
@@ -493,10 +462,87 @@ exports.useFocused = useFocused;
 
 /***/ }),
 
-/***/ "./src/ts/components/EditorPanel/element.tsx":
-/*!***************************************************!*\
-  !*** ./src/ts/components/EditorPanel/element.tsx ***!
-  \***************************************************/
+/***/ "./src/ts/components/DocumentPanel.tsx":
+/*!*********************************************!*\
+  !*** ./src/ts/components/DocumentPanel.tsx ***!
+  \*********************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function get() {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  }
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+
+var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+
+var Panel_1 = __webpack_require__(/*! @components/UI/Panel */ "./src/ts/components/UI/Panel.tsx");
+
+var Editor_1 = __importDefault(__webpack_require__(/*! @components/Editor */ "./src/ts/components/Editor/index.tsx"));
+
+var DocumentPanel = function DocumentPanel(_a) {
+  var document = _a.document,
+      onClose = _a.onClose;
+  var renderTitle = react_1.useCallback(function () {
+    return react_1["default"].createElement("span", null, document.path);
+  }, [document]);
+  return react_1["default"].createElement(Panel_1.Panel, {
+    renderTitle: renderTitle,
+    onClose: onClose
+  }, react_1["default"].createElement(Editor_1["default"], {
+    fileName: document.path
+  }));
+};
+
+exports.default = DocumentPanel;
+
+/***/ }),
+
+/***/ "./src/ts/components/Editor/element.tsx":
+/*!**********************************************!*\
+  !*** ./src/ts/components/Editor/element.tsx ***!
+  \**********************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -567,10 +613,10 @@ exports.default = Element;
 
 /***/ }),
 
-/***/ "./src/ts/components/EditorPanel/index.tsx":
-/*!*************************************************!*\
-  !*** ./src/ts/components/EditorPanel/index.tsx ***!
-  \*************************************************/
+/***/ "./src/ts/components/Editor/index.tsx":
+/*!********************************************!*\
+  !*** ./src/ts/components/Editor/index.tsx ***!
+  \********************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -671,11 +717,9 @@ var slate_react_1 = __webpack_require__(/*! slate-react */ "./node_modules/slate
 
 var slate_history_1 = __webpack_require__(/*! slate-history */ "./node_modules/slate-history/dist/index.es.js");
 
-var DocumentPanel_1 = __importDefault(__webpack_require__(/*! @components/UI/DocumentPanel */ "./src/ts/components/UI/DocumentPanel.tsx"));
+var leaf_1 = __importDefault(__webpack_require__(/*! ./leaf */ "./src/ts/components/Editor/leaf.tsx"));
 
-var leaf_1 = __importDefault(__webpack_require__(/*! ./leaf */ "./src/ts/components/EditorPanel/leaf.tsx"));
-
-var element_1 = __importDefault(__webpack_require__(/*! ./element */ "./src/ts/components/EditorPanel/element.tsx")); //import { Keybinding, useKeybinding, useKeybindings } from '@hooks/index';
+var element_1 = __importDefault(__webpack_require__(/*! ./element */ "./src/ts/components/Editor/element.tsx")); //import { Keybinding, useKeybinding, useKeybindings } from '@hooks/index';
 
 
 var emptyBuffer = [{
@@ -683,62 +727,21 @@ var emptyBuffer = [{
   children: [{
     text: ''
   }]
-}];
-var MARK_BINDINGS = [['mod+b', 'bold'], ['mod+i', 'italic'], ['mod+u', 'underline'], ['ctrl+`', 'code']];
-var BLOCK_BINDINGS = [['mod+0', 'title'], ['mod+1', 'heading'], ['mod+2', 'subheading'], ['mod+3', 'subsubheading']];
+}]; //const MARK_BINDINGS: [string, string][] = [
+//['mod+b', 'bold'],
+//['mod+i', 'italic'],
+//['mod+u', 'underline'],
+//['ctrl+`', 'code'],
+//];
+//const BLOCK_BINDINGS: [string, SlateElement['type']][] = [
+//['mod+0', 'title'],
+//['mod+1', 'heading'],
+//['mod+2', 'subheading'],
+//['mod+3', 'subsubheading'],
+//];
 
-var isMarkActive = function isMarkActive(editor, format) {
-  var marks = slate_1.Editor.marks(editor);
-  return marks ? marks[format] === true : false;
-};
-
-var isBlockActive = function isBlockActive(editor, format) {
-  var _a = __read(slate_1.Editor.nodes(editor, {
-    match: function match(n) {
-      return !slate_1.Editor.isEditor(n) && slate_1.Element.isElement(n) && n.type === format;
-    }
-  }), 1),
-      match = _a[0];
-
-  return !!match;
-};
-
-var toggleMark = function toggleMark(editor, format) {
-  var isActive = isMarkActive(editor, format);
-
-  if (isActive) {
-    slate_1.Editor.removeMark(editor, format);
-  } else {
-    slate_1.Editor.addMark(editor, format, true);
-  }
-};
-
-var toggleBlock = function toggleBlock(editor, format) {
-  var isActive = isBlockActive(editor, format); //const isList = LIST_TYPES.includes(format);
-  //Transforms.unwrapNodes(editor, {
-  //match: n =>
-  //LIST_TYPES.includes(
-  //!Editor.isEditor(n) && SlateElement.isElement(n) && n.type
-  //),
-  //split: true,
-  //})
-
-  var newProperties = {
-    //type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-    type: isActive ? 'paragraph' : format
-  };
-  slate_1.Transforms.setNodes(editor, newProperties); //if (!isActive && isList) {
-  //const block = { type: format, children: [] }
-  //Transforms.wrapNodes(editor, block)
-  //}
-};
-
-var EditorPanel = function EditorPanel(_a) {
-  var fileName = _a.fileName,
-      focused = _a.focused,
-      onClose = _a.onClose,
-      onFocus = _a.onFocus,
-      onSetToolbar = _a.onSetToolbar;
+var Editor = function Editor(_a) {
+  var fileName = _a.fileName;
   var editor = react_1.useMemo(function () {
     return slate_history_1.withHistory(slate_react_1.withReact(slate_1.createEditor()));
   }, []);
@@ -779,17 +782,19 @@ var EditorPanel = function EditorPanel(_a) {
   //}, []);
   //useKeybindings(keybindings, focused);
   //useKeybinding(['mod+s', save], focused);
+  //useEffect(() => {
+  //if (focused) {
+  //console.log(`Focused ${fileName}`);
+  ////ReactEditor.focus(editor);
+  //onSetToolbar(toolbar);
+  //// TODO: Move cursor to the end
+  //// TODO: Move cursor back to where it was originally
+  //} else {
+  ////ReactEditor.blur(editor);
+  //// FIXME: We can't unset toolbar here if we click away 
+  //}
+  //}, [focused]);
 
-  react_1.useEffect(function () {
-    if (focused) {
-      console.log("Focused " + fileName); //ReactEditor.focus(editor);
-
-      onSetToolbar(toolbar); // TODO: Move cursor to the end
-      // TODO: Move cursor back to where it was originally
-    } else {//ReactEditor.blur(editor);
-        // FIXME: We can't unset toolbar here if we click away 
-      }
-  }, [focused]);
   react_1.useEffect(function () {
     window.fs.readFile(fileName).then(function (data) {
       var val = JSON.parse(data); // FIXME: Check if the descendant is valid
@@ -811,12 +816,7 @@ var EditorPanel = function EditorPanel(_a) {
     return react_1["default"].createElement(element_1["default"], __assign({}, props));
   }, []); // TODO: Make it so clicking on the document actually focuses
 
-  return react_1["default"].createElement(DocumentPanel_1["default"], {
-    title: fileName,
-    dirty: dirty,
-    //focused={ focused }
-    onClose: onClose
-  }, react_1["default"].createElement("div", {
+  return react_1["default"].createElement("div", {
     className: "mx-auto max-w-3xl"
   }, react_1["default"].createElement(slate_react_1.Slate, {
     editor: editor,
@@ -828,17 +828,17 @@ var EditorPanel = function EditorPanel(_a) {
     spellCheck: true,
     renderLeaf: renderLeaf,
     renderElement: renderElement
-  }))));
+  })));
 };
 
-exports.default = EditorPanel;
+exports.default = Editor;
 
 /***/ }),
 
-/***/ "./src/ts/components/EditorPanel/leaf.tsx":
-/*!************************************************!*\
-  !*** ./src/ts/components/EditorPanel/leaf.tsx ***!
-  \************************************************/
+/***/ "./src/ts/components/Editor/leaf.tsx":
+/*!*******************************************!*\
+  !*** ./src/ts/components/Editor/leaf.tsx ***!
+  \*******************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -903,10 +903,10 @@ exports.default = Leaf;
 
 /***/ }),
 
-/***/ "./src/ts/components/UI/DocumentPanel.tsx":
-/*!************************************************!*\
-  !*** ./src/ts/components/UI/DocumentPanel.tsx ***!
-  \************************************************/
+/***/ "./src/ts/components/UI/Panel.tsx":
+/*!****************************************!*\
+  !*** ./src/ts/components/UI/Panel.tsx ***!
+  \****************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -965,14 +965,20 @@ var __importStar = this && this.__importStar || function (mod) {
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
+exports.Panel = void 0;
 
 var Focus_1 = __webpack_require__(/*! @components/Contexts/Focus */ "./src/ts/components/Contexts/Focus.tsx");
 
 var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+/**
+ * A flexible panel which resides in a [[PanelContainer]].
+ * The panel also provides a [[FocusContext]] which is intended to provide whether or
+ * not the panel is the currently focused panel in the container.
+ */
 
-var DocumentPanel = function DocumentPanel(_a) {
-  var title = _a.title,
-      dirty = _a.dirty,
+
+var Panel = function Panel(_a) {
+  var renderTitle = _a.renderTitle,
       onClose = _a.onClose,
       children = _a.children;
   var renderWrapper = react_1.useCallback(function (_a) {
@@ -992,16 +998,16 @@ var DocumentPanel = function DocumentPanel(_a) {
   }, react_1["default"].createElement("div", {
     className: "absolute left-0 top-0 py-3.5 pl-3 flex space-x-1.5"
   }, react_1["default"].createElement("button", {
-    className: "w-3.5 h-3.5 bg-red-400 rounded-full",
+    className: "w-3.5 h-3.5 bg-red-400 rounded-full focus:outline-none",
     onClick: onClose
   })), react_1["default"].createElement("div", {
-    className: "text-center text-sm font-light " + (dirty ? 'italic' : '') + " select-none"
-  }, title + (dirty ? '*' : ''))), react_1["default"].createElement("div", {
+    className: "text-center text-sm font-light select-none"
+  }, renderTitle())), react_1["default"].createElement("div", {
     className: "pt-12 px-8 h-full min-h-0 overflow-y-scroll"
   }, children));
 };
 
-exports.default = DocumentPanel;
+exports.Panel = Panel;
 
 /***/ }),
 
@@ -1108,6 +1114,38 @@ var WithToolbar = function WithToolbar(_a) {
 };
 
 exports.default = WithToolbar;
+
+/***/ }),
+
+/***/ "./src/ts/types/Document.ts":
+/*!**********************************!*\
+  !*** ./src/ts/types/Document.ts ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.Document = void 0;
+exports.Document = {
+  key: function key(doc) {
+    switch (doc.type) {
+      case 'file':
+        return doc.path;
+    }
+  },
+  isEqual: function isEqual(lhs, rhs) {
+    if (lhs.type !== rhs.type) return false;
+
+    switch (lhs.type) {
+      case 'file':
+        return lhs.path === rhs.path;
+    }
+  }
+};
 
 /***/ }),
 

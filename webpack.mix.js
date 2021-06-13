@@ -14,6 +14,7 @@ mix
 			alias: {
 				'@components': path.resolve(__dirname, 'src/ts/components'),
 				'@hooks': path.resolve(__dirname, 'src/ts/hooks'),
+				'@types': path.resolve(__dirname, 'src/ts/types'),
 			}
 		}
 	});

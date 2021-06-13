@@ -1,35 +1,13 @@
-import React, { useState, useEffect, useMemo, useCallback, useReducer } from 'react';
+import React, { useReducer } from 'react';
+
+// TODO: Fix import here
+import { Document } from '../../types/Document';
 
 import WithSidebar from '@components/UI/WithSidebar';
 import WithToolbar from '@components/UI/WithToolbar';
 import PanelContainer from '@components/UI/PanelContainer';
-import DocumentPanel from '@components/UI/DocumentPanel';
-
 import Browser from '@components/Browser';
-import EditorPanel from '@components/EditorPanel';
-
-type FileDocument = {
-	type: 'file';
-	path: string;
-};
-
-type Document = FileDocument;
-
-const Document = {
-	key: (doc: Document): string => {
-		switch (doc.type) {
-			case 'file':
-				return doc.path;
-		}
-	},
-	isEqual: (lhs: Document, rhs: Document): boolean => {
-		if (lhs.type !== rhs.type) return false;
-		switch (lhs.type) {
-			case 'file':
-				return lhs.path === rhs.path;
-		}
-	},
-};
+import DocumentPanel from '@components/DocumentPanel';
 
 type OpenDocument = {
 	type: 'open',
@@ -110,34 +88,18 @@ const App = () => {
 
 	const documentPanels = state.documents.map((doc) => {
 		const key = Document.key(doc);
-		switch (doc.type) {
-			case 'file':
-				return (
-					<EditorPanel 
-						key={ key }
-						fileName={ doc.path }
-						focused={ state.focused === key }
-						onClose={ () => {
-							dispatch({
-								type: 'close',
-								key: key,
-							});
-						}}
-						onFocus={ () => {
-							dispatch({
-								type: 'focus',
-								key: key,
-							});
-						}}
-						onSetToolbar={ (toolbar: JSX.Element) => {
-							dispatch({
-								type: 'setToolbar',
-								toolbar: toolbar,
-							});
-						}}
-					/>
-				);
-		}
+		return (
+			<DocumentPanel
+				key={ key }
+				document={ doc }
+				onClose={ () => {
+					dispatch({
+						type: 'close',
+						key: key,
+					});
+				}}
+			/>
+		);
 	});
 
 	return (
