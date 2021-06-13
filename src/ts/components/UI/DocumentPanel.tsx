@@ -1,12 +1,12 @@
 import React from 'react';
 
-const DocumentPanel = ({ title, dirty, focused, onClose, onFocus, children }) => {
+const DocumentPanel = ({ title, dirty, onClose, children }) => {
+	const focused = false; // TODO
 	const shadow = focused ? 'shadow-lg' : 'shadow-md';
 	const translate = focused ? '-translate-y-1' : '';
 	return (
 		<div
 			className={ `relative h-full flex-1 bg-white overflow-hidden rounded-md transform ${shadow} ${translate} transition-transform transition-shadow outline-none` }
-			onClick={ onFocus }
 		>
 			<div className="absolute top-0 inset-x-0 z-10 py-3 bg-white">
 				<div className="absolute left-0 top-0 py-3.5 pl-3 flex space-x-1.5">

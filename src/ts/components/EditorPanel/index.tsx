@@ -10,7 +10,7 @@ import DocumentPanel from '@components/UI/DocumentPanel';
 import Leaf from './leaf';
 import Element from './element';
 
-import { Keybinding, useKeybinding, useKeybindings } from '@hooks/index';
+//import { Keybinding, useKeybinding, useKeybindings } from '@hooks/index';
 
 const emptyBuffer: Descendant[] = [{
 	type: 'paragraph',
@@ -30,121 +30,6 @@ const BLOCK_BINDINGS: [string, SlateElement['type']][] = [
 	['mod+2', 'subheading'],
 	['mod+3', 'subsubheading'],
 ];
-
-const EditorPanel = ({ fileName, focused, onClose, onFocus, onSetToolbar }) => {
-	const editor: CustomEditor = useMemo(() => {
-		return withHistory(withReact(createEditor()))
-	}, []);
-
-	const [savedValue, setSavedValue] = useState<Descendant[] | undefined>(undefined);
-	const [value, setValue] = useState<Descendant[]>(emptyBuffer);
-
-	// TODO: Hmmm, inefficient?
-	const dirty: boolean = (value !== savedValue);
-
-	const toolbar = useMemo(() => (
-		<div className="py-4 bg-white">
-			Hello from { fileName }
-		</div>
-	), [fileName]);
-
-	const save = useCallback(() => {
-		// TODO: Do we make a copy of the value here in case it changes?
-		const val = JSON.stringify(value);
-		window.fs.writeFile(fileName, val)
-		.then(() => {
-			setSavedValue(value);
-		})
-		.catch((err: any) => {
-			console.error(err);
-		});
-	}, [value]);
-
-	// FIXME: if save func changes, this wont work (I think)
-	const keybindings: Keybinding[] = useMemo(() => {
-		return [
-			...MARK_BINDINGS.map(([combo, mark]): Keybinding => [combo, () => {
-				toggleMark(editor, mark);
-			}]),
-			...BLOCK_BINDINGS.map(([combo, block]): Keybinding => [combo, () => {
-				toggleBlock(editor, block);
-			}]),
-		];
-	}, []);
-
-	useKeybindings(keybindings, focused);
-	useKeybinding(['mod+s', save], focused);
-
-	useEffect(() => {
-		if (focused) {
-			console.log(`Focused ${fileName}`);
-			ReactEditor.focus(editor);
-			onSetToolbar(toolbar);
-			// TODO: Move cursor to the end
-			// TODO: Move cursor back to where it was originally
-		} else {
-			ReactEditor.blur(editor);
-			// FIXME: We can't unset toolbar here if we click away 
-		}
-	}, [focused]);
-
-	useEffect(() => {
-		window.fs.readFile(fileName)
-		.then((data: string) => {
-			const val = JSON.parse(data);
-			// FIXME: Check if the descendant is valid
-			//if (!Node.isNodeList(val)) {
-				//throw 'Invalid document';
-			//}
-			// TODO: Do we combine this into one?
-			setValue(val);
-			setSavedValue(val);
-		})
-		.catch((err: any) => {
-			console.error(err);
-		});
-	}, [fileName]);
-
-
-
-	const renderLeaf = useCallback(props => <Leaf { ...props }/>, []);
-	const renderElement = useCallback(props => <Element { ...props }/>, []);
-
-	// TODO: Make it so clicking on the document actually focuses
-
-	return (
-		<DocumentPanel
-			title={ fileName }
-			dirty={ dirty }
-			focused={ focused }
-			onClose={ onClose }
-			onFocus={ () => {
-				if (!focused) {
-					onFocus();
-				} else if (!ReactEditor.isFocused(editor)) {
-					ReactEditor.focus(editor);
-					Transforms.move(editor, {
-						edge: 'end',
-					});
-				}
-			}}
-		>
-			<div className="mx-auto max-w-3xl">
-				<Slate
-					editor={ editor }
-					value={ value }
-					onChange={ (newValue) => setValue(newValue) }
-				>
-					<Editable
-						spellCheck
-						renderLeaf={ renderLeaf }
-						renderElement={ renderElement }
-					/>
-				</Slate>
-			</div>
-		</DocumentPanel>
-	);
-};
 
 const isMarkActive = (editor: Editor, format: string) => {
 	const marks = Editor.marks(editor);
@@ -191,6 +76,121 @@ const toggleBlock = (editor: Editor, format: SlateElement['type']) => {
 		//Transforms.wrapNodes(editor, block)
 	//}
 }
+
+
+const EditorPanel = ({ fileName, focused, onClose, onFocus, onSetToolbar }) => {
+	const editor: CustomEditor = useMemo(() => {
+		return withHistory(withReact(createEditor()))
+	}, []);
+
+	const [savedValue, setSavedValue] = useState<Descendant[] | undefined>(undefined);
+	const [value, setValue] = useState<Descendant[]>(emptyBuffer);
+
+	// TODO: Hmmm, inefficient?
+	const dirty: boolean = (value !== savedValue);
+
+	const toolbar = useMemo(() => (
+		<div className="py-4 bg-white">
+			Hello from { fileName }
+		</div>
+	), [fileName]);
+
+	const save = useCallback(() => {
+		// TODO: Do we make a copy of the value here in case it changes?
+		const val = JSON.stringify(value);
+		window.fs.writeFile(fileName, val)
+		.then(() => {
+			setSavedValue(value);
+		})
+		.catch((err: any) => {
+			console.error(err);
+		});
+	}, [value]);
+
+	// FIXME: if save func changes, this wont work (I think)
+	//const keybindings: Keybinding[] = useMemo(() => {
+		//return [
+			//...MARK_BINDINGS.map(([combo, mark]): Keybinding => [combo, () => {
+				//toggleMark(editor, mark);
+			//}]),
+			//...BLOCK_BINDINGS.map(([combo, block]): Keybinding => [combo, () => {
+				//toggleBlock(editor, block);
+			//}]),
+		//];
+	//}, []);
+
+	//useKeybindings(keybindings, focused);
+	//useKeybinding(['mod+s', save], focused);
+
+	useEffect(() => {
+		if (focused) {
+			console.log(`Focused ${fileName}`);
+			//ReactEditor.focus(editor);
+			onSetToolbar(toolbar);
+			// TODO: Move cursor to the end
+			// TODO: Move cursor back to where it was originally
+		} else {
+			//ReactEditor.blur(editor);
+			// FIXME: We can't unset toolbar here if we click away 
+		}
+	}, [focused]);
+
+	useEffect(() => {
+		window.fs.readFile(fileName)
+		.then((data: string) => {
+			const val = JSON.parse(data);
+			// FIXME: Check if the descendant is valid
+			//if (!Node.isNodeList(val)) {
+				//throw 'Invalid document';
+			//}
+			// TODO: Do we combine this into one?
+			setValue(val);
+			setSavedValue(val);
+		})
+		.catch((err: any) => {
+			console.error(err);
+		});
+	}, [fileName]);
+
+	const renderLeaf = useCallback(props => <Leaf { ...props }/>, []);
+	const renderElement = useCallback(props => <Element { ...props }/>, []);
+
+	// TODO: Make it so clicking on the document actually focuses
+
+	return (
+		<DocumentPanel
+			title={ fileName }
+			dirty={ dirty }
+			//focused={ focused }
+			onClose={ onClose }
+			//onFocus={ () => {
+				//if (!focused) {
+					//onFocus();
+				//} else if (!ReactEditor.isFocused(editor)) {
+					//ReactEditor.focus(editor);
+					//Transforms.move(editor, {
+						//edge: 'end',
+					//});
+				//}
+			//}}
+		>
+			<div className="mx-auto max-w-3xl">
+				<Slate
+					editor={ editor }
+					value={ value }
+					onChange={ (newValue) => setValue(newValue) }
+				>
+					<Editable
+						spellCheck
+						renderLeaf={ renderLeaf }
+						renderElement={ renderElement }
+					/>
+				</Slate>
+			</div>
+		</DocumentPanel>
+	);
+};
+
 
 
 export default EditorPanel;
