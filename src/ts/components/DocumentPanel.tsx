@@ -4,11 +4,34 @@ import Editor from '@components/Editor';
 
 // TODO: fix import
 import { Document } from '../types/Document';
+import { useFile } from '@hooks/file';
+import { Descendant } from 'slate';
+
+const emptyBuffer: Descendant[] = [{
+	type: 'paragraph',
+	children: [{ text: '' }],
+}];
+
+function deserializeDocument(data: string): Descendant[] {
+	const json: any = JSON.parse(data);
+	// FIXME: validate
+	const parsed: Descendant[] = json as Descendant[];
+	return parsed;
+}
+
+function serializeDocument(data: Descendant[]): string {
+	return JSON.stringify(data);
+}
 
 const DocumentPanel = ({ document, onClose }: {
 	document: Document,
 	onClose: () => void,
 }) => {
+	const [value, setValue, save] = useFile<Descendant[]>(document.path, {
+		serializer: serializeDocument,
+		deserializer: deserializeDocument,
+	}, emptyBuffer);
+
 	const renderTitle = useCallback(() => {
 		return (
 			<span>{ document.path }</span>
@@ -21,7 +44,8 @@ const DocumentPanel = ({ document, onClose }: {
 			onClose={ onClose }
 		>
 			<Editor
-				fileName={ document.path }
+				value={ value }
+				setValue={ setValue }
 			/>
 		</Panel>
 	);

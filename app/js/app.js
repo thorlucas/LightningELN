@@ -505,6 +505,33 @@ var __importStar = this && this.__importStar || function (mod) {
   return result;
 };
 
+var __read = this && this.__read || function (o, n) {
+  var m = typeof Symbol === "function" && o[Symbol.iterator];
+  if (!m) return o;
+  var i = m.call(o),
+      r,
+      ar = [],
+      e;
+
+  try {
+    while ((n === void 0 || n-- > 0) && !(r = i.next()).done) {
+      ar.push(r.value);
+    }
+  } catch (error) {
+    e = {
+      error: error
+    };
+  } finally {
+    try {
+      if (r && !r.done && (m = i["return"])) m.call(i);
+    } finally {
+      if (e) throw e.error;
+    }
+  }
+
+  return ar;
+};
+
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -521,9 +548,38 @@ var Panel_1 = __webpack_require__(/*! @components/UI/Panel */ "./src/ts/componen
 
 var Editor_1 = __importDefault(__webpack_require__(/*! @components/Editor */ "./src/ts/components/Editor/index.tsx"));
 
+var file_1 = __webpack_require__(/*! @hooks/file */ "./src/ts/hooks/file.ts");
+
+var emptyBuffer = [{
+  type: 'paragraph',
+  children: [{
+    text: ''
+  }]
+}];
+
+function deserializeDocument(data) {
+  var json = JSON.parse(data); // FIXME: validate
+
+  var parsed = json;
+  return parsed;
+}
+
+function serializeDocument(data) {
+  return JSON.stringify(data);
+}
+
 var DocumentPanel = function DocumentPanel(_a) {
   var document = _a.document,
       onClose = _a.onClose;
+
+  var _b = __read(file_1.useFile(document.path, {
+    serializer: serializeDocument,
+    deserializer: deserializeDocument
+  }, emptyBuffer), 3),
+      value = _b[0],
+      setValue = _b[1],
+      save = _b[2];
+
   var renderTitle = react_1.useCallback(function () {
     return react_1["default"].createElement("span", null, document.path);
   }, [document]);
@@ -531,7 +587,8 @@ var DocumentPanel = function DocumentPanel(_a) {
     renderTitle: renderTitle,
     onClose: onClose
   }, react_1["default"].createElement(Editor_1["default"], {
-    fileName: document.path
+    value: value,
+    setValue: setValue
   }));
 };
 
@@ -672,33 +729,6 @@ var __importStar = this && this.__importStar || function (mod) {
   return result;
 };
 
-var __read = this && this.__read || function (o, n) {
-  var m = typeof Symbol === "function" && o[Symbol.iterator];
-  if (!m) return o;
-  var i = m.call(o),
-      r,
-      ar = [],
-      e;
-
-  try {
-    while ((n === void 0 || n-- > 0) && !(r = i.next()).done) {
-      ar.push(r.value);
-    }
-  } catch (error) {
-    e = {
-      error: error
-    };
-  } finally {
-    try {
-      if (r && !r.done && (m = i["return"])) m.call(i);
-    } finally {
-      if (e) throw e.error;
-    }
-  }
-
-  return ar;
-};
-
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
@@ -720,14 +750,7 @@ var slate_history_1 = __webpack_require__(/*! slate-history */ "./node_modules/s
 var leaf_1 = __importDefault(__webpack_require__(/*! ./leaf */ "./src/ts/components/Editor/leaf.tsx"));
 
 var element_1 = __importDefault(__webpack_require__(/*! ./element */ "./src/ts/components/Editor/element.tsx")); //import { Keybinding, useKeybinding, useKeybindings } from '@hooks/index';
-
-
-var emptyBuffer = [{
-  type: 'paragraph',
-  children: [{
-    text: ''
-  }]
-}]; //const MARK_BINDINGS: [string, string][] = [
+//const MARK_BINDINGS: [string, string][] = [
 //['mod+b', 'bold'],
 //['mod+i', 'italic'],
 //['mod+u', 'underline'],
@@ -740,75 +763,13 @@ var emptyBuffer = [{
 //['mod+3', 'subsubheading'],
 //];
 
+
 var Editor = function Editor(_a) {
-  var fileName = _a.fileName;
+  var value = _a.value,
+      setValue = _a.setValue;
   var editor = react_1.useMemo(function () {
     return slate_history_1.withHistory(slate_react_1.withReact(slate_1.createEditor()));
   }, []);
-
-  var _b = __read(react_1.useState(undefined), 2),
-      savedValue = _b[0],
-      setSavedValue = _b[1];
-
-  var _c = __read(react_1.useState(emptyBuffer), 2),
-      value = _c[0],
-      setValue = _c[1]; // TODO: Hmmm, inefficient?
-
-
-  var dirty = value !== savedValue;
-  var toolbar = react_1.useMemo(function () {
-    return react_1["default"].createElement("div", {
-      className: "py-4 bg-white"
-    }, "Hello from ", fileName);
-  }, [fileName]);
-  var save = react_1.useCallback(function () {
-    // TODO: Do we make a copy of the value here in case it changes?
-    var val = JSON.stringify(value);
-    window.fs.writeFile(fileName, val).then(function () {
-      setSavedValue(value);
-    })["catch"](function (err) {
-      console.error(err);
-    });
-  }, [value]); // FIXME: if save func changes, this wont work (I think)
-  //const keybindings: Keybinding[] = useMemo(() => {
-  //return [
-  //...MARK_BINDINGS.map(([combo, mark]): Keybinding => [combo, () => {
-  //toggleMark(editor, mark);
-  //}]),
-  //...BLOCK_BINDINGS.map(([combo, block]): Keybinding => [combo, () => {
-  //toggleBlock(editor, block);
-  //}]),
-  //];
-  //}, []);
-  //useKeybindings(keybindings, focused);
-  //useKeybinding(['mod+s', save], focused);
-  //useEffect(() => {
-  //if (focused) {
-  //console.log(`Focused ${fileName}`);
-  ////ReactEditor.focus(editor);
-  //onSetToolbar(toolbar);
-  //// TODO: Move cursor to the end
-  //// TODO: Move cursor back to where it was originally
-  //} else {
-  ////ReactEditor.blur(editor);
-  //// FIXME: We can't unset toolbar here if we click away 
-  //}
-  //}, [focused]);
-
-  react_1.useEffect(function () {
-    window.fs.readFile(fileName).then(function (data) {
-      var val = JSON.parse(data); // FIXME: Check if the descendant is valid
-      //if (!Node.isNodeList(val)) {
-      //throw 'Invalid document';
-      //}
-      // TODO: Do we combine this into one?
-
-      setValue(val);
-      setSavedValue(val);
-    })["catch"](function (err) {
-      console.error(err);
-    });
-  }, [fileName]);
   var renderLeaf = react_1.useCallback(function (props) {
     return react_1["default"].createElement(leaf_1["default"], __assign({}, props));
   }, []);
@@ -1114,6 +1075,81 @@ var WithToolbar = function WithToolbar(_a) {
 };
 
 exports.default = WithToolbar;
+
+/***/ }),
+
+/***/ "./src/ts/hooks/file.ts":
+/*!******************************!*\
+  !*** ./src/ts/hooks/file.ts ***!
+  \******************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var __read = this && this.__read || function (o, n) {
+  var m = typeof Symbol === "function" && o[Symbol.iterator];
+  if (!m) return o;
+  var i = m.call(o),
+      r,
+      ar = [],
+      e;
+
+  try {
+    while ((n === void 0 || n-- > 0) && !(r = i.next()).done) {
+      ar.push(r.value);
+    }
+  } catch (error) {
+    e = {
+      error: error
+    };
+  } finally {
+    try {
+      if (r && !r.done && (m = i["return"])) m.call(i);
+    } finally {
+      if (e) throw e.error;
+    }
+  }
+
+  return ar;
+};
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.useFile = void 0;
+
+var react_1 = __webpack_require__(/*! react */ "./node_modules/react/index.js"); // TODO: Make optionals
+
+
+function useFile(filePath, _a, init) {
+  var serializer = _a.serializer,
+      deserializer = _a.deserializer;
+
+  var _b = __read(react_1.useState(init), 2),
+      value = _b[0],
+      setValue = _b[1];
+
+  react_1.useEffect(function () {
+    window.fs.readFile(filePath).then(function (data) {
+      setValue(deserializer(data));
+    })["catch"](function (err) {
+      console.error(err);
+    });
+  }, [filePath]); // TODO: Set a saving state so that value isnt changed etc
+
+  var save = react_1.useCallback(function () {
+    var data = serializer(value);
+    window.fs.writeFile(filePath, data).then(function () {
+      console.log("Saved " + filePath);
+    })["catch"](function (err) {
+      console.error(err);
+    });
+  }, [value]);
+  return [value, setValue, save];
+}
+
+exports.useFile = useFile;
 
 /***/ }),
 
