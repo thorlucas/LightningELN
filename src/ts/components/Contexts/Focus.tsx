@@ -6,7 +6,7 @@ type FocusProviderWrapperRenderer = ({ attributes, children, focused }: {
 	attributes: any,
 	children: JSX.Element[] | JSX.Element,
 	focused: boolean,
-}) => JSX.Element;
+}) => JSX.Element | JSX.Element[];
 
 interface FocusProviderProps {
 	wrapperAttributes?: any, // TODO: Type

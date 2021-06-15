@@ -41,6 +41,11 @@ const DocumentPanel = ({ document, onClose }: {
 		<Panel
 			title={ titleElement }
 			onClose={ onClose }
+			renderInnerWrapper={ ({ children }) => (
+				<div className="h-full">
+					{ children }
+				</div>
+			)}
 		>
 			<Editor
 				value={ value }
