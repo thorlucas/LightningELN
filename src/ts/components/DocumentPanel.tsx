@@ -6,6 +6,7 @@ import Editor from '@components/Editor';
 import { Document } from '../types/Document';
 import { useFile } from '@hooks/file';
 import { Descendant } from 'slate';
+import { KeybindingGroup } from './Contexts/Keybinding';
 
 const emptyBuffer: Descendant[] = [{
 	type: 'paragraph',
@@ -42,11 +43,22 @@ const DocumentPanel = ({ document, onClose }: {
 		<Panel
 			renderTitle={ renderTitle }
 			onClose={ onClose }
+			renderInnerWrapper={ ({ attributes, children }) => (
+				<div { ...attributes }>
+					{ children }
+				</div>
+			)}
 		>
-			<Editor
-				value={ value }
-				setValue={ setValue }
-			/>
+			<KeybindingGroup render={ ({ attributes, children }) => (
+				<div className="h-full" { ...attributes }>
+					{ children }
+				</div>
+			)}>
+				<Editor
+					value={ value }
+					setValue={ setValue }
+				/>
+			</KeybindingGroup>
 		</Panel>
 	);
 };
