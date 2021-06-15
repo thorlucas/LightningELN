@@ -1,9 +1,30 @@
-import React, { Context, createContext, FocusEvent, useCallback, useRef, useState, useContext } from 'react';
+import React, { Context, createContext, FocusEvent, useCallback, useState, useContext, useMemo } from 'react';
 
 export const FocusContext: Context<boolean> = createContext<boolean>(false);
 
-export const FocusProvider = ({ render, children }) => {
-	const ref = useRef<HTMLDivElement>(null);
+type FocusProviderWrapperRenderer = ({ attributes, children, focused }: {
+	attributes: any,
+	children: JSX.Element[] | JSX.Element,
+	focused: boolean,
+}) => JSX.Element;
+
+interface FocusProviderProps {
+	wrapperAttributes?: any, // TODO: Type
+	renderWrapper?: FocusProviderWrapperRenderer,
+	children: JSX.Element[] | JSX.Element,
+}
+
+const defaultWrapperRenderer: FocusProviderWrapperRenderer = ({ attributes, children }) => (
+	<div { ...attributes }>
+		{ children }
+	</div>
+);
+
+export const FocusProvider: React.FC<FocusProviderProps> = ({
+	wrapperAttributes = {},
+	renderWrapper = defaultWrapperRenderer,
+	children,
+}) => {
 	const [focused, setFocused] = useState<boolean>(false);
 
 	const onFocus = useCallback(() => {
@@ -19,16 +40,18 @@ export const FocusProvider = ({ render, children }) => {
 		}, 0);
 	}, []);
 
+	const _wrapperAttributes = useMemo(() => ({
+		...wrapperAttributes,
+		tabIndex: -1,
+		onBlur: onBlur,
+		onFocus: onFocus,
+	}), []);
+
 	return (
 		<FocusContext.Provider value={ focused }>
 			{
-				render({
-					attributes: {
-						tabIndex: -1,
-						ref: ref,
-						onBlur: onBlur,
-						onFocus: onFocus,
-					},
+				renderWrapper({
+					attributes: _wrapperAttributes,
 					children: children,
 					focused: focused,
 				})

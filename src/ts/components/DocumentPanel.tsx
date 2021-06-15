@@ -33,32 +33,19 @@ const DocumentPanel = ({ document, onClose }: {
 		deserializer: deserializeDocument,
 	}, emptyBuffer);
 
-	const renderTitle = useCallback(() => {
-		return (
-			<span className={ dirty ? 'italic' : '' }>{ document.path }</span>
-		);
-	}, [document, dirty]);
+	const renderTitle = useCallback(() => (
+		<span className={ dirty ? 'italic' : '' }>{ document.path }</span>
+	), [document, dirty]);
 
 	return (
 		<Panel
 			renderTitle={ renderTitle }
 			onClose={ onClose }
-			renderInnerWrapper={ ({ attributes, children }) => (
-				<div { ...attributes }>
-					{ children }
-				</div>
-			)}
 		>
-			<KeybindingGroup render={ ({ attributes, children }) => (
-				<div className="h-full" { ...attributes }>
-					{ children }
-				</div>
-			)}>
-				<Editor
-					value={ value }
-					setValue={ setValue }
-				/>
-			</KeybindingGroup>
+			<Editor
+				value={ value }
+				setValue={ setValue }
+			/>
 		</Panel>
 	);
 };
