@@ -1,12 +1,20 @@
 import { FocusContext, FocusProvider } from '@components/Contexts/Focus';
 import React, { useCallback } from 'react';
 
+type PanelCloseCallback = () => void;
+
+interface PanelProps {
+	title?: JSX.Element | JSX.Element[],
+	onClose?: PanelCloseCallback,
+	children?: JSX.Element | JSX.Element[],
+}
+
 /**
  * A flexible panel which resides in a [[PanelContainer]].
  * The panel also provides a [[FocusContext]] which is intended to provide whether or
  * not the panel is the currently focused panel in the container.
  */
-export const Panel = ({ renderTitle, onClose, children }) => {
+export const Panel: React.FC<PanelProps> = ({ title, onClose, children }) => {
 	const renderWrapper = useCallback(({ attributes, children, focused }) => {
 		const shadow = focused ? 'shadow-lg' : 'shadow-md';
 		const translate = focused ? '-translate-y-1' : '';
@@ -30,9 +38,11 @@ export const Panel = ({ renderTitle, onClose, children }) => {
 						onClick={ onClose }
 					></button>
 				</div>
-				<div className="text-center text-sm font-light select-none">
-					{ renderTitle() }
-				</div>
+				{ title && (
+					<div className="text-center text-sm font-light select-none">
+						{ title }
+					</div>
+				)}
 			</div>
 			<div className="pt-12 px-8 h-full min-h-0 overflow-y-scroll">
 				{ children }

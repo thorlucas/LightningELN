@@ -33,13 +33,13 @@ const DocumentPanel = ({ document, onClose }: {
 		deserializer: deserializeDocument,
 	}, emptyBuffer);
 
-	const renderTitle = useCallback(() => (
+	const titleElement = useMemo(() => (
 		<span className={ dirty ? 'italic' : '' }>{ document.path }</span>
 	), [document, dirty]);
 
 	return (
 		<Panel
-			renderTitle={ renderTitle }
+			title={ titleElement }
 			onClose={ onClose }
 		>
 			<Editor
