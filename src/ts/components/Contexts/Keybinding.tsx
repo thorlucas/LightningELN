@@ -1,5 +1,5 @@
 import isHotkey from "is-hotkey";
-import React, { KeyboardEvent as ReactKeyboardEvent, useCallback, useState } from "react";
+import React, { Context, Dispatch, KeyboardEvent as ReactKeyboardEvent, useCallback, useContext, useEffect, useReducer, useState } from "react";
 
 type KeybindingGroupWrapperRenderer = ({ attributes, children }: {
 	attributes: any,
@@ -23,12 +23,32 @@ type Keybinding = {
 	callback: () => void,
 }
 
+type AddKeybinding = {
+	type: 'add',
+	trigger: string,
+	callback: () => void,
+}
+
+type KeybindingAction = AddKeybinding;
+
+function keybindingReducer(state: Keybinding[], action: KeybindingAction) {
+	switch (action.type) {
+		case 'add':
+			return state.concat({
+				match: isHotkey(action.trigger),
+				callback: action.callback,
+			});
+	}
+}
+
+const KeybindingContext = React.createContext<Dispatch<KeybindingAction>>(undefined!);
+
 export const KeybindingGroup: React.FC<KeybindingGroupProps> = ({
 	wrapperAttributes = {},
 	renderWrapper = defaultWrapperRenderer,
 	children,
 }) => {
-	const [keybindings, setKeybindings] = useState<Keybinding[]>([]);
+	const [keybindings, dispatch] = useReducer(keybindingReducer, []);
 
 	const onKeyDown = useCallback((event: ReactKeyboardEvent) => {
 		// FIXME: Terribly non-performant because it will run every check on every
@@ -40,7 +60,11 @@ export const KeybindingGroup: React.FC<KeybindingGroupProps> = ({
 	}, [keybindings]);
 
 	return renderWrapper({
-		children: children,
+		children: (
+			<KeybindingContext.Provider value={ dispatch }>
+				{ children }
+			</KeybindingContext.Provider>
+		),
 		attributes: {
 			...wrapperAttributes,
 			tabIndex: -1,
@@ -48,3 +72,14 @@ export const KeybindingGroup: React.FC<KeybindingGroupProps> = ({
 		},
 	});
 };
+
+export function useKeybinding(trigger: string, callback: () => void) {
+	const dispatch = useContext(KeybindingContext);
+	useEffect(() => {
+		dispatch({
+			type: 'add',
+			trigger: trigger,
+			callback: callback,
+		});
+	}, []);
+}
