@@ -49,6 +49,7 @@
 	},
 	"dependencies": {
 		"@types/mousetrap": "^1.6.8",
+		"is-hotkey": "^0.1.8",
 		"mousetrap": "^1.6.5"
 	}
 }
