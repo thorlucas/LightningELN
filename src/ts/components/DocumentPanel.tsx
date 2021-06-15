@@ -42,9 +42,9 @@ const DocumentPanel = ({ document, onClose }: {
 			title={ titleElement }
 			onClose={ onClose }
 			renderInnerWrapper={ ({ children }) => (
-				<div className="h-full">
+				<KeybindingGroup wrapperAttributes={{ className: "h-full focus:outline-none" }}>
 					{ children }
-				</div>
+				</KeybindingGroup>
 			)}
 		>
 			<Editor
