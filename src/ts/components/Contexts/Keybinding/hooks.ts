@@ -39,12 +39,10 @@ export function useKeybinder(): [KeyBinder, KeybindingHandler] {
 	const [state, dispatch] = useReducer(reducer, emptyKeybindingState());
 
 	const keybinder: KeyBinder = useMemo(() => {
-		console.log("Updating keybinder");
 		return createKeyBinder(state.nextId, dispatch);
 	}, [state.nextId]);
 
 	const handler: KeybindingHandler = useMemo(() => {
-		console.log("Updating handler");
 		return createKeybindingHandler(state.map);
 	}, [state.map]);
 
