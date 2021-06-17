@@ -5,28 +5,28 @@ import { Slate, Editable, withReact, ReactEditor } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { CustomEditor } from './types';
 
-import Leaf from './leaf';
 import Element from './element';
-import { toggleMark } from './util';
+import Leaf from './leaf';
+import { toggleBlock, toggleMark } from './util';
 import { useKeybinding } from '@components/Contexts/Keybinding';
-import { useKeybindings } from '@components/Contexts/Keybinding/hooks';
+import { KeybindingTriggerCallbackArgMap, useKeybindings } from '@components/Contexts/Keybinding/hooks';
 
 //import { Keybinding, useKeybinding, useKeybindings } from '@hooks/index';
 
 
-//const MARK_BINDINGS: [string, string][] = [
-	//['mod+b', 'bold'],
-	//['mod+i', 'italic'],
-	//['mod+u', 'underline'],
-	//['ctrl+`', 'code'],
-//];
+const MARK_BINDINGS: KeybindingTriggerCallbackArgMap<[string]> = {
+	'mod+b': ['bold'],
+	'mod+i': ['italic'],
+	'mod+u': ['underline'],
+	'ctrl+`': ['code'],
+};
 
-//const BLOCK_BINDINGS: [string, SlateElement['type']][] = [
-	//['mod+0', 'title'],
-	//['mod+1', 'heading'],
-	//['mod+2', 'subheading'],
-	//['mod+3', 'subsubheading'],
-//];
+const BLOCK_BINDINGS: KeybindingTriggerCallbackArgMap<[SlateElement['type']]> = {
+	'mod+0': ['title'],
+	'mod+1': ['heading'],
+	'mod+2': ['subheading'],
+	'mod+3': ['subsubheading'],
+};
 
 const Editor = ({ value, setValue }) => {
 	const editor: CustomEditor = useMemo(() => {
@@ -40,10 +40,12 @@ const Editor = ({ value, setValue }) => {
 		toggleMark(editor, mark);
 	}, []);
 
-	useKeybindings({
-		'mod+b': ['bold'],
-		'mod+i': ['italic'],
-	}, toggleMarkKeybinding);
+	const toggleBlockKeybinding = useCallback((block: SlateElement['type']) => {
+		toggleBlock(editor, block);
+	}, []);
+
+	useKeybindings(MARK_BINDINGS, toggleMarkKeybinding);
+	useKeybindings(BLOCK_BINDINGS, toggleBlockKeybinding);
 
 	// TODO: Make it so clicking on the document actually focuses
 
