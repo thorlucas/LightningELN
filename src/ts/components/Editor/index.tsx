@@ -9,6 +9,7 @@ import Leaf from './leaf';
 import Element from './element';
 import { toggleMark } from './util';
 import { useKeybinding } from '@components/Contexts/Keybinding';
+import { useKeybindings } from '@components/Contexts/Keybinding/hooks';
 
 //import { Keybinding, useKeybinding, useKeybindings } from '@hooks/index';
 
@@ -35,11 +36,14 @@ const Editor = ({ value, setValue }) => {
 	const renderLeaf = useCallback(props => <Leaf { ...props }/>, []);
 	const renderElement = useCallback(props => <Element { ...props }/>, []);
 
-	const toggleBold = useCallback(() => {
-		toggleMark(editor, 'bold');
+	const toggleMarkKeybinding = useCallback((mark: string) => {
+		toggleMark(editor, mark);
 	}, []);
 
-	useKeybinding('mod+b', toggleBold);
+	useKeybindings({
+		'mod+b': ['bold'],
+		'mod+i': ['italic'],
+	}, toggleMarkKeybinding);
 
 	// TODO: Make it so clicking on the document actually focuses
 

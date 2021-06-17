@@ -1,12 +1,12 @@
 import { KeybindingDispatch } from "./reducer";
 
 export type KeybindingID = number;
-export type KeybindingCallback = () => void;
+export type KeybindingCallback<T extends unknown[] = []> = (...args: T) => void;
 export type KeybindingTrigger = string;
 
 export type KeybindingMatcher = (event: KeyboardEvent) => boolean;
 
-export type Keybinding = {
+type Keybinding = {
 	match: KeybindingMatcher,
 	callback: KeybindingCallback,
 }
