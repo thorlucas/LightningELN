@@ -35,14 +35,11 @@ const Editor = ({ value, setValue }) => {
 	const renderLeaf = useCallback(props => <Leaf { ...props }/>, []);
 	const renderElement = useCallback(props => <Element { ...props }/>, []);
 
-	const [foo, setFoo] = useState<string>('asdf');
+	const toggleBold = useCallback(() => {
+		toggleMark(editor, 'bold');
+	}, []);
 
-	const printFoo = useCallback(() => {
-		console.log(foo);
-		setFoo('bar');
-	}, [foo]);
-
-	useKeybinding('mod+b', printFoo);
+	useKeybinding('mod+b', toggleBold);
 
 	// TODO: Make it so clicking on the document actually focuses
 
