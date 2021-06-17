@@ -7,7 +7,7 @@ import { CustomEditor } from './types';
 
 import Leaf from './leaf';
 import Element from './element';
-import {} from './util';
+import { toggleMark } from './util';
 import { useKeybinding } from '@components/Contexts/Keybinding';
 
 //import { Keybinding, useKeybinding, useKeybindings } from '@hooks/index';
@@ -35,9 +35,14 @@ const Editor = ({ value, setValue }) => {
 	const renderLeaf = useCallback(props => <Leaf { ...props }/>, []);
 	const renderElement = useCallback(props => <Element { ...props }/>, []);
 
-	useKeybinding('mod+b', () => {
-		console.log("Bold");
-	});
+	const [foo, setFoo] = useState<string>('asdf');
+
+	const printFoo = useCallback(() => {
+		console.log(foo);
+		setFoo('bar');
+	}, [foo]);
+
+	useKeybinding('mod+b', printFoo);
 
 	// TODO: Make it so clicking on the document actually focuses
 
