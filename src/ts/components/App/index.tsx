@@ -8,6 +8,8 @@ import WithToolbar from '@components/UI/WithToolbar';
 import PanelContainer from '@components/UI/PanelContainer';
 import Browser from '@components/Browser';
 import DocumentPanel from '@components/DocumentPanel';
+import { Keybinding, KeybindingGroup } from '@components/Contexts/Keybinding';
+import { FullWrapper } from '@components/UI/FullWrapper';
 
 type OpenDocument = {
 	type: 'open',

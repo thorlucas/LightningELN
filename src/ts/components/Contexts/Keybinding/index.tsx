@@ -3,14 +3,17 @@ import { KeybindingHandler } from "./handler";
 import { useKeybinder, useKeybinding } from "./hooks";
 import { KeyBinder, KeybindingCallback, KeybindingTrigger } from "./keybinder";
 
-type KeybindingGroupWrapperRenderer = ({ attributes, children }: {
-	attributes: any,
+interface KeybindingGroupWrapperProps {
 	children: JSX.Element | JSX.Element[],
-}) => JSX.Element;
+	attributes: any,
+}
+
+type KeybindingGroupWrapperRenderer = (props: KeybindingGroupWrapperProps) => JSX.Element;
 
 interface KeybindingGroupProps {
 	wrapperAttributes?: any,
 	renderWrapper?: KeybindingGroupWrapperRenderer,
+	Wrapper?: React.FC<KeybindingGroupWrapperProps>,
 	children: JSX.Element[] | JSX.Element,
 }
 
@@ -33,12 +36,13 @@ export { useKeybinding } from './hooks';
 export const KeybindingGroup: React.FC<KeybindingGroupProps> = ({
 	wrapperAttributes = {},
 	renderWrapper = defaultWrapperRenderer,
+	Wrapper = null,
 	children,
 }) => {
 
 	const [keybinder, handler]: [KeyBinder, KeybindingHandler] = useKeybinder();
 
-	return renderWrapper({
+	const props: KeybindingGroupWrapperProps = {
 		children: (
 			<KeybinderContext.Provider value={ keybinder }>
 				{ children }
@@ -49,7 +53,13 @@ export const KeybindingGroup: React.FC<KeybindingGroupProps> = ({
 			tabIndex: -1,
 			onKeyDown: handler,
 		},
-	});
+	};
+
+	if (Wrapper) {
+		return <Wrapper { ...props } />;
+	} else {
+		return renderWrapper(props);
+	}
 };
 
 export const Keybinding: React.FC<KeybindingProps> = ({
