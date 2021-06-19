@@ -8,11 +8,9 @@ import { CustomEditor } from './types';
 import Element from './element';
 import Leaf from './leaf';
 import { toggleBlock, toggleMark } from './util';
-import { useKeybinding } from '@components/Contexts/Keybinding';
 import { KeybindingTriggerCallbackArgMap, useKeybindings } from '@components/Contexts/Keybinding/hooks';
 
 //import { Keybinding, useKeybinding, useKeybindings } from '@hooks/index';
-
 
 const MARK_BINDINGS: KeybindingTriggerCallbackArgMap<[string]> = {
 	'mod+b': ['bold'],

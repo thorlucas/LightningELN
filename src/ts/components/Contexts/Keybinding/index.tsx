@@ -1,7 +1,7 @@
 import React from "react";
 import { KeybindingHandler } from "./handler";
-import { useKeybinder } from "./hooks";
-import { KeyBinder } from "./keybinder";
+import { useKeybinder, useKeybinding } from "./hooks";
+import { KeyBinder, KeybindingCallback, KeybindingTrigger } from "./keybinder";
 
 type KeybindingGroupWrapperRenderer = ({ attributes, children }: {
 	attributes: any,
@@ -12,6 +12,11 @@ interface KeybindingGroupProps {
 	wrapperAttributes?: any,
 	renderWrapper?: KeybindingGroupWrapperRenderer,
 	children: JSX.Element[] | JSX.Element,
+}
+
+interface KeybindingProps {
+	trigger: KeybindingTrigger,
+	callback: KeybindingCallback,
 }
 
 const defaultWrapperRenderer: KeybindingGroupWrapperRenderer = ({ attributes, children }) => (
@@ -45,3 +50,12 @@ export const KeybindingGroup: React.FC<KeybindingGroupProps> = ({
 		},
 	});
 };
+
+export const Keybinding: React.FC<KeybindingProps> = ({
+	trigger,
+	callback
+}) => {
+	useKeybinding(trigger, callback);
+	
+	return null;
+}

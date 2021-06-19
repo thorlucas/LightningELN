@@ -6,7 +6,7 @@ import Editor from '@components/Editor';
 import { Document } from '../types/Document';
 import { useFile } from '@hooks/file';
 import { Descendant } from 'slate';
-import { KeybindingGroup } from './Contexts/Keybinding';
+import { Keybinding, KeybindingGroup, useKeybinding } from './Contexts/Keybinding';
 
 const emptyBuffer: Descendant[] = [{
 	type: 'paragraph',
@@ -47,6 +47,10 @@ const DocumentPanel = ({ document, onClose }: {
 				</KeybindingGroup>
 			)}
 		>
+			<Keybinding
+				trigger={ "mod+s" }
+				callback={ save }
+			/>
 			<Editor
 				value={ value }
 				setValue={ setValue }
