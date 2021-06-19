@@ -8,7 +8,10 @@ export function createKeybindingHandler(map: KeybindingMap): KeybindingHandler {
 		const nativeEvent = event.nativeEvent;
 		[...map.values()]
 			.filter(keybinding => keybinding.match(nativeEvent))
-			.forEach(keybinding => keybinding.callback());
+			.forEach(keybinding => {
+				if (keybinding.prevent) event.preventDefault();
+				keybinding.callback()
+			});
 	};
 	return handler;
 }

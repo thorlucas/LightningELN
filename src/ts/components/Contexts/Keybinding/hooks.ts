@@ -9,16 +9,20 @@ export type KeybindingTriggerCallbackArgMap<T extends unknown[]> = {
 	[key in KeybindingTrigger]: T;
 }
 
-export function useKeybinding(trigger: KeybindingTrigger, callback: KeybindingCallback, keybinder?: KeyBinder) {
+export function useKeybinding(
+	trigger: KeybindingTrigger,
+	callback: KeybindingCallback,
+	prevent: boolean = false,
+	keybinder?: KeyBinder) {
 	const _keybinder: KeyBinder = keybinder || useContext(KeybinderContext);
 
 	useEffect(
-		() => _keybinder(trigger, callback),
+		() => _keybinder(trigger, callback, prevent),
 		[trigger, callback]
 	);
 }
 
-export function useKeybindings<T extends unknown[]>(map: KeybindingTriggerCallbackArgMap<T>, callback: KeybindingCallback<T>) {
+export function useKeybindings<T extends unknown[]>(map: KeybindingTriggerCallbackArgMap<T>, callback: KeybindingCallback<T>, prevent: boolean = false) {
 	const keybinder = useContext(KeybinderContext);
 
 	_.chain(map)
@@ -29,7 +33,7 @@ export function useKeybindings<T extends unknown[]>(map: KeybindingTriggerCallba
 		)
 	)
 	.forEach(
-		(curried: KeybindingCallback, trigger: KeybindingTrigger) => useKeybinding(trigger, curried, keybinder)
+		(curried: KeybindingCallback, trigger: KeybindingTrigger) => useKeybinding(trigger, curried, prevent, keybinder)
 	)
 	.value();
 }

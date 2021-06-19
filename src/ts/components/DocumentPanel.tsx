@@ -47,10 +47,8 @@ const DocumentPanel = ({ document, onClose }: {
 				</KeybindingGroup>
 			)}
 		>
-			<Keybinding
-				trigger={ "mod+s" }
-				callback={ save }
-			/>
+			<Keybinding trigger={ "mod+s" } callback={ save } />
+			<Keybinding trigger={ "mod+w" } callback={ onClose } prevent={ true } />
 			<Editor
 				value={ value }
 				setValue={ setValue }

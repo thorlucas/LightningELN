@@ -6,6 +6,7 @@ export type BindKey = {
 	type: 'bind',
 	trigger: KeybindingTrigger,
 	callback: KeybindingCallback,
+	prevent: boolean,
 }
 
 export type UnbindKey = {
@@ -23,6 +24,7 @@ function bindKey(state: KeybindingState, action: BindKey): KeybindingState {
 	state.map.set(state.nextId++, {
 		match: isHotkey(action.trigger),
 		callback: action.callback,
+		prevent: action.prevent,
 	});
 	return state;
 }

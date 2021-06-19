@@ -17,6 +17,7 @@ interface KeybindingGroupProps {
 interface KeybindingProps {
 	trigger: KeybindingTrigger,
 	callback: KeybindingCallback,
+	prevent?: boolean,
 }
 
 const defaultWrapperRenderer: KeybindingGroupWrapperRenderer = ({ attributes, children }) => (
@@ -53,9 +54,10 @@ export const KeybindingGroup: React.FC<KeybindingGroupProps> = ({
 
 export const Keybinding: React.FC<KeybindingProps> = ({
 	trigger,
-	callback
+	callback,
+	prevent = false,
 }) => {
-	useKeybinding(trigger, callback);
+	useKeybinding(trigger, callback, prevent);
 	
 	return null;
 }
