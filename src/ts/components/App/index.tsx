@@ -1,80 +1,31 @@
 import React, { useReducer } from 'react';
 
-// TODO: Fix import here
-import { Document } from '../../types/Document';
-
 import WithSidebar from '@components/UI/WithSidebar';
 import WithToolbar from '@components/UI/WithToolbar';
 import PanelContainer from '@components/UI/PanelContainer';
 import Browser from '@components/Browser';
 import DocumentPanel from '@components/DocumentPanel';
-import { Keybinding, KeybindingGroup } from '@components/Contexts/Keybinding';
-import { FullWrapper } from '@components/UI/FullWrapper';
+import { appStateReducer } from './reducer';
+import { Document } from '../../types/Document';
+import { SettingsContext } from '@components/Contexts/Settings/context';
+import { Settings } from '@components/Contexts/Settings';
 
-type OpenDocument = {
-	type: 'open',
-	document: Document,
-}
-
-type CloseDocument = {
-	type: 'close',
-	key: string,
-}
-
-type FocusDocument = {
-	type: 'focus',
-	key: string,
-}
-
-type SetToolbar = {
-	type: 'setToolbar',
-	toolbar: JSX.Element,
-}
-
-type AppAction =
-	OpenDocument
-	| CloseDocument
-	| FocusDocument
-	| SetToolbar;
-
-type AppState = {
-	documents: Document[],
-	focused: string | null,
-	toolbar: JSX.Element | null,
-}
-
-function appStateReducer(state: AppState, action: AppAction): AppState {
-	switch (action.type) {
-		case 'open':
-			const doc = state.documents.find((doc) => Document.key(doc) === Document.key(action.document));
-			if (doc === undefined) {
-				return { 
-					...state,
-					documents: [action.document].concat(state.documents),
-					focused: Document.key(action.document),
-				};
-			} else {
-				return {
-					...state,
-					focused: Document.key(doc),
-				};
-			}
-		case 'close':
-			return {
-				documents: state.documents.filter((doc) => Document.key(doc) !== action.key),
-				focused: state.focused === action.key ? null : state.focused,
-				toolbar: state.focused === action.key ? null : state.toolbar,
-			};
-		case 'focus':
-			return {
-				...state,
-				focused: action.key,
-			};
-		case 'setToolbar':
-			return {
-				...state,
-				toolbar: action.toolbar,
-			};
+const defaultSettings: Settings = {
+	Keybindings: {
+		editor: new Map([
+			['TOGGLE_BOLD', 'mod+b'],
+			['TOGGLE_ITALIC', 'mod+i'],
+			['TOGGLE_UNDERLINE', 'mod+u'],
+			['TOGGLE_CODE', 'ctrl+`'],
+			['TOGGLE_TITLE', 'mod+0'],
+			['TOGGLE_HEADING', 'mod+1'],
+			['TOGGLE_SUBHEADING', 'mod+2'],
+			['TOGGLE_SUBSUBHEADING', 'mod+3'],
+		]),
+		document: new Map([
+			['SAVE', 'mod+s'],
+			['CLOSE', 'mod+w'],
+		]),
 	}
 }
 
@@ -105,22 +56,24 @@ const App = () => {
 	});
 
 	return (
-		<WithSidebar sidebar={
-			<Browser
-				onSelectDocument={ (document: Document) => {
-					dispatch({
-						type: 'open',
-						document: document,
-					});
-				}}
-			/>
-		}>
-			<WithToolbar toolbar={ state.toolbar }>
-				<PanelContainer>
-					{ documentPanels }
-				</PanelContainer>
-			</WithToolbar>
-		</WithSidebar>
+		<SettingsContext.Provider value={ defaultSettings }>
+			<WithSidebar sidebar={
+				<Browser
+					onSelectDocument={ (document: Document) => {
+						dispatch({
+							type: 'open',
+							document: document,
+						});
+					}}
+				/>
+			}>
+				<WithToolbar toolbar={ state.toolbar }>
+					<PanelContainer>
+						{ documentPanels }
+					</PanelContainer>
+				</WithToolbar>
+			</WithSidebar>
+		</SettingsContext.Provider>
 	);
 };
 
