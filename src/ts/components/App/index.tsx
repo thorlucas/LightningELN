@@ -10,22 +10,31 @@ import { Document } from '../../types/Document';
 import { SettingsContext } from '@components/Contexts/Settings/context';
 import { Settings } from '@components/Contexts/Settings';
 
+//const defaultSettings: Settings = {
+	//keybindings: {
+		//editor: new Map([
+			//['TOGGLE_BOLD', 'mod+b'],
+			//['TOGGLE_ITALIC', 'mod+i'],
+			//['TOGGLE_UNDERLINE', 'mod+u'],
+			//['TOGGLE_CODE', 'ctrl+`'],
+			//['TOGGLE_TITLE', 'mod+0'],
+			//['TOGGLE_HEADING', 'mod+1'],
+			//['TOGGLE_SUBHEADING', 'mod+2'],
+			//['TOGGLE_SUBSUBHEADING', 'mod+3'],
+		//]),
+		//document: {
+			//SAVE: 'mod+s',
+			//CLOSE: 'mod+w',
+		//}
+	//}
+//}
+
 const defaultSettings: Settings = {
-	Keybindings: {
-		editor: new Map([
-			['TOGGLE_BOLD', 'mod+b'],
-			['TOGGLE_ITALIC', 'mod+i'],
-			['TOGGLE_UNDERLINE', 'mod+u'],
-			['TOGGLE_CODE', 'ctrl+`'],
-			['TOGGLE_TITLE', 'mod+0'],
-			['TOGGLE_HEADING', 'mod+1'],
-			['TOGGLE_SUBHEADING', 'mod+2'],
-			['TOGGLE_SUBSUBHEADING', 'mod+3'],
-		]),
-		document: new Map([
-			['SAVE', 'mod+s'],
-			['CLOSE', 'mod+w'],
-		]),
+	document: {
+		keybindings: {
+			save_document: 'mod+s',
+			close_document: 'mod+w',
+		}
 	}
 }
 

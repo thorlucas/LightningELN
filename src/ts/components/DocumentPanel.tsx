@@ -7,6 +7,7 @@ import { Document } from '../types/Document';
 import { useFile } from '@hooks/file';
 import { Descendant } from 'slate';
 import { Keybinding, KeybindingGroup, useKeybinding } from './Contexts/Keybinding';
+import { useSetting } from './Contexts/Settings/hooks';
 
 const emptyBuffer: Descendant[] = [{
 	type: 'paragraph',
@@ -37,6 +38,8 @@ const DocumentPanel = ({ document, onClose }: {
 		<span className={ dirty ? 'italic' : '' }>{ document.path }</span>
 	), [document, dirty]);
 
+	const documentKeymappings = useSetting('document').keybindings;
+
 	return (
 		<Panel
 			title={ titleElement }
@@ -47,8 +50,8 @@ const DocumentPanel = ({ document, onClose }: {
 				</KeybindingGroup>
 			)}
 		>
-			<Keybinding trigger={ "mod+s" } callback={ save } />
-			<Keybinding trigger={ "mod+w" } callback={ onClose } prevent={ true } />
+			<Keybinding trigger={ documentKeymappings.save_document } callback={ save } />
+			<Keybinding trigger={ documentKeymappings.close_document } callback={ onClose } prevent={ true } />
 			<Editor
 				value={ value }
 				setValue={ setValue }
